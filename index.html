@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เกมรับผลไม้ Pixel</title>
+<style>
+  body {
+    font-family: monospace;
+    text-align: center;
+    background-color: #222;
+    color: #fff;
+    margin: 0;
+    overflow: hidden;
+  }
+  #gameArea {
+    position: relative;
+    width: 400px;
+    height: 600px;
+    margin: 20px auto;
+    border: 2px solid #fff;
+    background-color: #444;
+    overflow: hidden;
+  }
+  .fruit, .bomb {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    image-rendering: pixelated; /* ทำให้ภาพดู pixel */
+  }
+  .fruit {
+    background-image: url('https://www.stkc.go.th/sites/default/files/stiarticle_images/1634528109.jpg'); /* ตัวอย่าง Pixel Apple */
+    background-size: cover;
+  }
+  .bomb {
+    background-image: url('https://www.engdict.com/data/dict/media/images_public/00007238638797957462332834_normal.png'); /* ตัวอย่าง Pixel Bomb */
+    background-size: cover;
+  }
+  #basket {
+    position: absolute;
+    bottom: 0;
+    left: 180px;
+    width: 80px;
+    height: 40px;
+    background-color: #964B00;
+    border-radius: 5px;
+  }
+  #stats {
+    display: flex;
+    justify-content: space-around;
+    margin: 10px;
+    font-size: 20px;
+  }
+</style>
+</head>
+<body>
+
+<h1>เกมรับผลไม้ Pixel 🍎</h1>
+<div id="stats">
+  <div id="hearts">❤️❤️❤️</div>
+  <div>คะแนน: <span id="score">0</span></div>
+</div>
+<div id="gameArea">
+  <div id="basket"></div>
+</div>
+
+<script>
+const gameArea = document.getElementById('gameArea');
+const basket = document.getElementById('basket');
+let hearts = 3;
+let score = 0;
+let speed = 3; // ความเร็วเริ่มต้น
+
+// เคลื่อนตะกร้า
+document.addEventListener('keydown', (e) => {
+  const basketLeft = basket.offsetLeft;
+  if(e.key === 'ArrowLeft' && basketLeft > 0){
+    basket.style.left = basketLeft - 20 + 'px';
+  } else if(e.key === 'ArrowRight' && basketLeft < gameArea.clientWidth - basket.clientWidth){
+    basket.style.left = basketLeft + 20 + 'px';
+  }
+});
+
+// สร้างผลไม้หรือระเบิด
+function createItem() {
+  const item = document.createElement('div');
+  const isBomb = Math.random() < 0.3; // 30% เป็นระเบิด
+  item.className = isBomb ? 'bomb' : 'fruit';
+  item.style.left = Math.random() * (gameArea.clientWidth - 32) + 'px';
+  item.style.top = '0px';
+  gameArea.appendChild(item);
+  
+  const fallInterval = setInterval(() => {
+    const top = parseInt(item.style.top);
+    if(top > gameArea.clientHeight - 32){
+      // ตรวจสอบชนตะกร้า
+      const basketLeft = basket.offsetLeft;
+      const basketRight = basketLeft + basket.offsetWidth;
+      const itemLeft = parseInt(item.style.left);
+      const itemRight = itemLeft + 32;
+      if(itemRight > basketLeft && itemLeft < basketRight){
+        if(isBomb){
+          hearts--;
+          updateHearts();
+          if(hearts <= 0){
+            alert('เกมจบแล้ว! คะแนนสุดท้าย: ' + score);
+            location.reload();
+          }
+        } else {
+          score++;
+          document.getElementById('score').textContent = score;
+          if(score % 5 === 0) speed += 0.5; // เร่งความเร็วทุก 5 คะแนน
+        }
+      }
+      item.remove();
+      clearInterval(fallInterval);
+    } else {
+      item.style.top = top + speed + 'px';
+    }
+  }, 50);
+}
+
+// อัปเดตหัวใจ
+function updateHearts(){
+  document.getElementById('hearts').textContent = '❤️'.repeat(hearts);
+}
+
+// สร้างผลไม้/ระเบิดทุก 1 วินาที
+setInterval(createItem, 1000);
+</script>
+
+</body>
+</html>
+
+
+// สร้างผลไม้/ระเบิดทุก 1 วินาที
+setInterval(createItem, 1000);
+</script>
+
+</body>
+</html>
